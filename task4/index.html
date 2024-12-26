@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Expense Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+           background-color: aqua;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            margin-top: 10rem;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid black;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input,
+        select,
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            background-color: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f9;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #f4f4f9;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Income Expense Calculator</h1>
+        <form id="entryForm">
+            <input type="text" id="description" placeholder="Description" required>
+            <input type="number" id="amount" placeholder="Amount" required>
+            <select id="type" required>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button type="submit">Add</button>
+        </form>
+
+        <table id="entriesTable">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <div class="summary">
+            <div>Total Income: <span id="totalIncome">0</span></div>
+            <div>Total Expense: <span id="totalExpense">0</span></div>
+            <div>Balance: <span id="balance">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        const entryForm = document.getElementById('entryForm');
+        const entriesTableBody = document.querySelector('#entriesTable tbody');
+        const totalIncomeEl = document.getElementById('totalIncome');
+        const totalExpenseEl = document.getElementById('totalExpense');
+        const balanceEl = document.getElementById('balance');
+
+        let entries = [];
+
+        function updateSummary() {
+            const income = entries.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+            const expense = entries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+            totalIncomeEl.textContent = income.toFixed(2);
+            totalExpenseEl.textContent = expense.toFixed(2);
+            balanceEl.textContent = (income - expense).toFixed(2);
+        }
+
+        function renderEntries() {
+            entriesTableBody.innerHTML = '';
+            entries.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.description}</td>
+                    <td>${entry.amount.toFixed(2)}</td>
+                    <td>${entry.type}</td>
+                    <td>
+                        <button onclick="editEntry(${index})">Edit</button>
+                        <button onclick="deleteEntry(${index})">Delete</button>
+                    </td>
+                `;
+                entriesTableBody.appendChild(row);
+            });
+            updateSummary();
+        }
+
+        function editEntry(index) {
+            const entry = entries[index];
+            document.getElementById('description').value = entry.description;
+            document.getElementById('amount').value = entry.amount;
+            document.getElementById('type').value = entry.type;
+            deleteEntry(index);
+        }
+
+        function deleteEntry(index) {
+            entries.splice(index, 1);
+            renderEntries();
+        }
+
+        entryForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
+
+            entries.push({ description, amount, type });
+            entryForm.reset();
+            renderEntries();
+        });
+
+        renderEntries();
+    </script>
+</body>
+
+</html>
